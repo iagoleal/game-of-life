@@ -162,6 +162,7 @@
         x: e.pageX - canvas.offsetLeft,
         y: e.pageY - canvas.offsetTop
       });
+      console.log('clicked on: ', pos.x, pos.y);
       return game.soul.addCell(pos);
     });
     window.game = new Interface(canvas);

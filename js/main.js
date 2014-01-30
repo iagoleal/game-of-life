@@ -21,9 +21,9 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
 
     Core.prototype.height = 0;
 
-    Core.prototype.population = 100;
+    Core.prototype.population = 500;
 
-    Core.prototype.born = 3;
+    Core.prototype.born = [3];
 
     Core.prototype.alive = [2, 3];
 
@@ -72,7 +72,7 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
         count = 0;
         for (i = _j = -1; _j <= 1; i = ++_j) {
           for (j = _k = -1; _k <= 1; j = ++_k) {
-            if ((i !== j) && this._isAlive(cell.x + i, cell.y + j)) {
+            if ((i !== j) && this._isAlive(cell.x + j, cell.y + i)) {
               count++;
             } else {
               this._deadUpdate({
@@ -98,13 +98,13 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
       count = 0;
       for (i = _i = -1; _i <= 1; i = ++_i) {
         for (j = _j = -1; _j <= 1; j = ++_j) {
-          if ((i !== j) && this._isAlive(cell.x + i, cell.y + j)) {
+          if ((i !== j) && this._isAlive(cell.x + j, cell.y + i)) {
             count++;
           }
         }
       }
       if (count === 3) {
-        return this.cells[this.cells.length] = new Cell(cell.x, cell.y);
+        return this.addCell(cell);
       }
     };
 

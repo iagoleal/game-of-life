@@ -106,6 +106,7 @@ window.onload = ->
 		pos = game.positionToGrid 
 			x: e.pageX - canvas.offsetLeft
 			y: e.pageY - canvas.offsetTop
+		console.log 'clicked on: ', pos.x, pos.y
 		game.soul.addCell pos
 
 	window.game = new Interface canvas

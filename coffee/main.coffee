@@ -12,9 +12,9 @@ State =
 class window.Core
 	width: 0
 	height: 0
-	population: 100
+	population: 500
 
-	born: 3
+	born: [3]
 	alive: [2, 3]
 	cells: null
 
@@ -40,7 +40,7 @@ class window.Core
 			count = 0
 			for i in [-1..1]
 				for j in [-1..1]
-					if (i isnt j) and @_isAlive(cell.x+i, cell.y+j) then count++
+					if (i isnt j) and @_isAlive(cell.x+j, cell.y+i) then count++
 					else @_deadUpdate {x: cell.x+i, y: cell.y+j}
 			
 			unless count in @alive
@@ -53,10 +53,10 @@ class window.Core
 		count = 0
 		for i in [-1..1]
 			for j in [-1..1]
-				count++ if (i isnt j) and @_isAlive(cell.x+i, cell.y+j)
+				count++ if (i isnt j) and @_isAlive(cell.x+j, cell.y+i)
 		if count is 3
-			@cells[@cells.length] = new Cell(cell.x, cell.y) 
-			#console.log 'flag ', @cells.length
+			@addCell(cell)
+			#@cells[@cells.length] = new Cell(cell.x, cell.y) 
 			
 			
 
