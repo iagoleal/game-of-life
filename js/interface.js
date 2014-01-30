@@ -64,14 +64,15 @@
     }
 
     Interface.prototype.loop = function() {
-      this.soul.update();
       console.log(this.soul.cells.length);
+      this.soul.update();
       return this.draw();
     };
 
     Interface.prototype.draw = function() {
       var cell, pos, _i, _len, _ref, _results;
       this.context.clearRect(0, 0, this.width, this.height);
+      this.drawGrid(this.squareSide, this.width, this.height);
       drawer.color = "green";
       _ref = this.soul.cells;
       _results = [];
@@ -171,7 +172,7 @@
     window.game.loop();
     return window.setTimeout(function() {
       return window.mainLoop();
-    }, 1000);
+    }, 1000 / 10);
   };
 
   window.requestAnimationFrame = (function() {

@@ -8,15 +8,20 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
 
 
 (function() {
-  var Cell,
+  var Cell, State,
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+  State = {
+    alive: true,
+    dead: null
+  };
 
   window.Core = (function() {
     Core.prototype.width = 0;
 
     Core.prototype.height = 0;
 
-    Core.prototype.total = 300;
+    Core.prototype.population = 100;
 
     Core.prototype.born = 3;
 
@@ -24,13 +29,13 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
 
     Core.prototype.cells = null;
 
-    function Core(size, total) {
+    function Core(size, population) {
       var cell, each, i, _i, _j, _len, _ref, _ref1;
-      this.total = total != null ? total : this.total;
+      this.population = population != null ? population : this.population;
       this.width = size.x;
       this.height = size.y;
       this.cells = [];
-      for (i = _i = 0, _ref = this.total - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      for (i = _i = 0, _ref = this.population - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
         cell = new Cell;
         cell.randomize(this.width, this.height);
         _ref1 = this.cells;
@@ -59,7 +64,7 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
     };
 
     Core.prototype.update = function() {
-      var cell, count, i, index, indexes, j, _i, _j, _k, _l, _len, _len1, _ref, _results;
+      var cell, count, i, index, indexes, j, _i, _j, _k, _l, _len, _len1, _ref;
       indexes = [];
       _ref = this.cells;
       for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
@@ -81,12 +86,11 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
           indexes[indexes.length] = index;
         }
       }
-      _results = [];
       for (_l = 0, _len1 = indexes.length; _l < _len1; _l++) {
         index = indexes[_l];
-        _results.push(this.cells.splice(index, 1));
+        delete this.cells[index];
       }
-      return _results;
+      return this.cells = this.cells.filter(Boolean);
     };
 
     Core.prototype._deadUpdate = function(cell) {
@@ -99,8 +103,7 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
           }
         }
       }
-      if (count === this.born) {
-        console.log('aaa');
+      if (count === 3) {
         return this.cells[this.cells.length] = new Cell(cell.x, cell.y);
       }
     };

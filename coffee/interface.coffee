@@ -42,14 +42,14 @@ class window.Interface
 		@soul = new Core (@positionToGrid {x:@width, y:@height} , total)
 
 	loop: () ->
-		@soul.update()
 		console.log @soul.cells.length
+		@soul.update()
 		@draw()
 
 	draw: () ->
 		@context.clearRect 0, 0, @width, @height
 		#Draw the grid
-		#@drawGrid @squareSide, @width, @height
+		@drawGrid @squareSide, @width, @height
 
 		# Draw each cell		
 		drawer.color = "green"
@@ -115,7 +115,7 @@ window.mainLoop = () ->
 	window.game.loop()
 	window.setTimeout ->
 		window.mainLoop()
-	, 1000
+	, 1000/10
 
 	#window.requestAnimationFrame mainLoop
 

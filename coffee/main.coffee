@@ -5,21 +5,24 @@ Any live cell with more than three live neighbours dies, as if by overcrowding.
 Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 ###
 
+State =
+	alive: true
+	dead: null
 
 class window.Core
 	width: 0
 	height: 0
-	total: 300
+	population: 100
 
 	born: 3
 	alive: [2, 3]
 	cells: null
 
-	constructor: (size,  @total=@total) ->
+	constructor: (size,  @population=@population) ->
 		@width = size.x
 		@height = size.y
 		@cells = []
-		for i in [0..@total-1]
+		for i in [0..@population-1]
 			cell = new Cell
 			cell.randomize @width, @height
 			(cell.randomize @width, @height) for each in @cells when cell.x is each.x and cell.y is each.y
@@ -39,18 +42,22 @@ class window.Core
 				for j in [-1..1]
 					if (i isnt j) and @_isAlive(cell.x+i, cell.y+j) then count++
 					else @_deadUpdate {x: cell.x+i, y: cell.y+j}
+			
 			unless count in @alive
 				indexes[indexes.length] = index 
-		@cells.splice(index, 1) for index in indexes
+
+		delete @cells[index] for index in indexes	
+		@cells = @cells.filter Boolean
 
 	_deadUpdate: (cell) ->
 		count = 0
 		for i in [-1..1]
 			for j in [-1..1]
 				count++ if (i isnt j) and @_isAlive(cell.x+i, cell.y+j)
-		if count is @born
-			console.log 'aaa'
-			@cells[@cells.length] = new Cell(cell.x, cell.y)
+		if count is 3
+			@cells[@cells.length] = new Cell(cell.x, cell.y) 
+			#console.log 'flag ', @cells.length
+			
 			
 
 	_isAlive: (x, y) ->
