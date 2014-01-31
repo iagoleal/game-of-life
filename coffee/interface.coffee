@@ -127,9 +127,10 @@ window.onload = ->
 
 window.mainLoop = () ->
 	window.game.loop()
+
 	window.setTimeout ->
 		window.mainLoop()
-	, 1000/10
+	, 1000/5
 
 	#window.requestAnimationFrame mainLoop
 

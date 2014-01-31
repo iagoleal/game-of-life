@@ -196,7 +196,7 @@
     window.game.loop();
     return window.setTimeout(function() {
       return window.mainLoop();
-    }, 1000 / 10);
+    }, 1000 / 5);
   };
 
   window.requestAnimationFrame = (function() {

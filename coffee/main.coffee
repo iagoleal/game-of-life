@@ -58,6 +58,7 @@ class Core
 
 
 	update: () ->
+		changes = []
 		for line, x in @cells
 			for cell, y in line
 				count = @neighbours x, y
@@ -66,12 +67,14 @@ class Core
 					when Status.dead
 						switch count
 							when 3
-								@addCell x, y
+								changes.push {x: x, y: y}
 					when Status.alive
 						switch count
 							when 2, 3
 							else		
-								@killCell x, y
+								changes.push {x: x, y: y}
+
+		@cells[i.x][i.y] = !@cells[i.x][i.y] for i in changes 
 				
 window.Status = Status
 window.Core = Core

@@ -94,42 +94,42 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
     };
 
     Core.prototype.update = function() {
-      var cell, count, line, x, y, _i, _len, _ref, _results;
+      var cell, changes, count, i, line, x, y, _i, _j, _k, _len, _len1, _len2, _ref, _results;
+      changes = [];
       _ref = this.cells;
-      _results = [];
       for (x = _i = 0, _len = _ref.length; _i < _len; x = ++_i) {
         line = _ref[x];
-        _results.push((function() {
-          var _j, _len1, _results1;
-          _results1 = [];
-          for (y = _j = 0, _len1 = line.length; _j < _len1; y = ++_j) {
-            cell = line[y];
-            count = this.neighbours(x, y);
-            switch (cell) {
-              case Status.dead:
-                switch (count) {
-                  case 3:
-                    _results1.push(this.addCell(x, y));
-                    break;
-                  default:
-                    _results1.push(void 0);
-                }
-                break;
-              case Status.alive:
-                switch (count) {
-                  case 2:
-                  case 3:
-                    break;
-                  default:
-                    _results1.push(this.killCell(x, y));
-                }
-                break;
-              default:
-                _results1.push(void 0);
-            }
+        for (y = _j = 0, _len1 = line.length; _j < _len1; y = ++_j) {
+          cell = line[y];
+          count = this.neighbours(x, y);
+          switch (cell) {
+            case Status.dead:
+              switch (count) {
+                case 3:
+                  changes.push({
+                    x: x,
+                    y: y
+                  });
+              }
+              break;
+            case Status.alive:
+              switch (count) {
+                case 2:
+                case 3:
+                  break;
+                default:
+                  changes.push({
+                    x: x,
+                    y: y
+                  });
+              }
           }
-          return _results1;
-        }).call(this));
+        }
+      }
+      _results = [];
+      for (_k = 0, _len2 = changes.length; _k < _len2; _k++) {
+        i = changes[_k];
+        _results.push(this.cells[i.x][i.y] = !this.cells[i.x][i.y]);
       }
       return _results;
     };
