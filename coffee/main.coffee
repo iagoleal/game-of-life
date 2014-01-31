@@ -5,81 +5,73 @@ Any live cell with more than three live neighbours dies, as if by overcrowding.
 Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 ###
 
-State =
+Status =
 	alive: true
-	dead: null
+	dead: false
 
-class window.Core
+class Core
 	width: 0
 	height: 0
-	population: 500
+	population: 1000
 
 	born: [3]
 	alive: [2, 3]
 	cells: null
 
-	constructor: (size,  @population=@population) ->
-		@width = size.x
-		@height = size.y
-		@cells = []
-		for i in [0..@population-1]
-			cell = new Cell
-			cell.randomize @width, @height
-			(cell.randomize @width, @height) for each in @cells when cell.x is each.x and cell.y is each.y
-			#console.log "created on: ", cell.x, cell.y
-			@cells.push cell
+	constructor: (@width=100,  @height=100, @population=@population) ->
+		@cells = new Array @width
+		for i in [0..@cells.length]
+			@cells[i] = new Array @height
+			for j in [0..@cells[i].length]
+				@cells[i][j] = Status.dead
 
-	addCell: (pos) ->
-		test = true for cell in @cells when cell.x is pos.x and cell.y is pos.y
-		if not test
-			@cells[@cells.length] = new Cell(pos.x, pos.y)
+		@randomize()
+
+	randomize: ->
+		for i in [0..@population]
+			x = ~~(Math.random()*@width)
+			y = ~~(Math.random()*@height)
+			if @cells[x][y] is Status.alive
+				--i
+			else
+				@cells[x][y] = Status.alive
+
+	addCell: (x, y) ->
+		if @cells[x][y] is Status.dead
+			@cells[x][y] = Status.alive
+			@population++
+
+	killCell: (x, y) ->
+		if @cells[x][y] is Status.alive
+			@cells[x][y] = Status.dead
+			@population--
+
+	isAlive: (x, y) -> @cells[x][y]
+
+	neighbours: (x, y) ->
+		count = 0
+		for i in [-1..1] when @cells[x+i] 
+			for j in [-1..1] when not (i == j and j == 0)
+				if @cells[x+i][y+j] is Status.alive
+					count += 1
+		return count
+
 
 	update: () ->
-		indexes = []
-		for cell, index in @cells
-			count = 0
-			for i in [-1..1]
-				for j in [-1..1]
-					if (i isnt j) and @_isAlive(cell.x+j, cell.y+i) then count++
-					else @_deadUpdate {x: cell.x+i, y: cell.y+j}
-			
-			unless count in @alive
-				indexes[indexes.length] = index 
+		for line, x in @cells
+			for cell, y in line
+				count = @neighbours x, y
 
-		delete @cells[index] for index in indexes	
-		@cells = @cells.filter Boolean
-
-	_deadUpdate: (cell) ->
-		count = 0
-		for i in [-1..1]
-			for j in [-1..1]
-				count++ if (i isnt j) and @_isAlive(cell.x+j, cell.y+i)
-		if count is 3
-			@addCell(cell)
-			#@cells[@cells.length] = new Cell(cell.x, cell.y) 
-			
-			
-
-	_isAlive: (x, y) ->
-		for cell in @cells
-			if cell.x is x and cell.y is y
-				return true
-		return false
-
-
-class Cell
-	x: 0
-	y: 0
-
-	constructor: (@x=0, @y=0) ->
-
-	randomize: (maxWidth, maxHeight) ->
-		#console.log maxWidth, maxHeight
-		@x = ~~(Math.random()*maxWidth)
-		@y = ~~(Math.random()*maxHeight)
-		#console.log @x, @y
-		{x: @x, y: @y}
-
-
-
+				switch cell
+					when Status.dead
+						switch count
+							when 3
+								@addCell x, y
+					when Status.alive
+						switch count
+							when 2, 3
+							else		
+								@killCell x, y
+				
+window.Status = Status
 window.Core = Core

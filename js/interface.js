@@ -51,41 +51,56 @@
 
     Interface.prototype.soul = null;
 
+    Interface.prototype.isPaused = false;
+
     function Interface(canvas, squareSide, total) {
+      var size;
       this.canvas = canvas;
       this.squareSide = squareSide != null ? squareSide : this.squareSide;
       this.context = this.canvas.getContext('2d');
       this.width = this.canvas.width;
       this.height = this.canvas.height;
-      this.soul = new Core(this.positionToGrid({
+      size = this.positionToGrid({
         x: this.width,
         y: this.height
-      }, total));
+      });
+      this.soul = new Core(size.x, size.y, total);
     }
 
     Interface.prototype.loop = function() {
-      console.log(this.soul.cells.length);
-      this.soul.update();
+      if (!this.isPaused) {
+        console.log(this.soul.population);
+        this.soul.update();
+      }
       return this.draw();
     };
 
     Interface.prototype.draw = function() {
-      var cell, pos, _i, _len, _ref, _results;
+      var cell, i, j, line, pos, _i, _len, _ref, _results;
       this.context.clearRect(0, 0, this.width, this.height);
       this.drawGrid(this.squareSide, this.width, this.height);
       drawer.color = "green";
       _ref = this.soul.cells;
       _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        cell = _ref[_i];
-        pos = this.gridToPosition({
-          x: cell.x,
-          y: cell.y
-        });
-        _results.push(drawer.rectangle(this.context, {
-          x: pos.x,
-          y: pos.y
-        }, this.squareSide, this.squareSide));
+      for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+        line = _ref[i];
+        _results.push((function() {
+          var _j, _len1, _results1;
+          _results1 = [];
+          for (j = _j = 0, _len1 = line.length; _j < _len1; j = ++_j) {
+            cell = line[j];
+            if (this.soul.cells[i][j] === Status.alive) {
+              pos = this.gridToPosition({
+                x: i,
+                y: j
+              });
+              _results1.push(drawer.rectangle(this.context, pos, this.squareSide, this.squareSide));
+            } else {
+              _results1.push(void 0);
+            }
+          }
+          return _results1;
+        }).call(this));
       }
       return _results;
     };
@@ -163,7 +178,15 @@
         y: e.pageY - canvas.offsetTop
       });
       console.log('clicked on: ', pos.x, pos.y);
-      return game.soul.addCell(pos);
+      console.log(game.soul.neighbours(pos.x, pos.y));
+      return game.soul.addCell(pos.x, pos.y);
+    });
+    $(document).keydown(function(e) {
+      switch (e.keyCode) {
+        case 32:
+          e.preventDefault();
+          return game.isPaused = !game.isPaused;
+      }
     });
     window.game = new Interface(canvas);
     return window.mainLoop();

@@ -8,20 +8,19 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
 
 
 (function() {
-  var Cell, State,
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  var Core, Status;
 
-  State = {
+  Status = {
     alive: true,
-    dead: null
+    dead: false
   };
 
-  window.Core = (function() {
+  Core = (function() {
     Core.prototype.width = 0;
 
     Core.prototype.height = 0;
 
-    Core.prototype.population = 500;
+    Core.prototype.population = 1000;
 
     Core.prototype.born = [3];
 
@@ -29,123 +28,117 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
 
     Core.prototype.cells = null;
 
-    function Core(size, population) {
-      var cell, each, i, _i, _j, _len, _ref, _ref1;
+    function Core(width, height, population) {
+      var i, j, _i, _j, _ref, _ref1;
+      this.width = width != null ? width : 100;
+      this.height = height != null ? height : 100;
       this.population = population != null ? population : this.population;
-      this.width = size.x;
-      this.height = size.y;
-      this.cells = [];
-      for (i = _i = 0, _ref = this.population - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-        cell = new Cell;
-        cell.randomize(this.width, this.height);
-        _ref1 = this.cells;
-        for (_j = 0, _len = _ref1.length; _j < _len; _j++) {
-          each = _ref1[_j];
-          if (cell.x === each.x && cell.y === each.y) {
-            cell.randomize(this.width, this.height);
-          }
+      this.cells = new Array(this.width);
+      for (i = _i = 0, _ref = this.cells.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        this.cells[i] = new Array(this.height);
+        for (j = _j = 0, _ref1 = this.cells[i].length; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; j = 0 <= _ref1 ? ++_j : --_j) {
+          this.cells[i][j] = Status.dead;
         }
-        this.cells.push(cell);
       }
+      this.randomize();
     }
 
-    Core.prototype.addCell = function(pos) {
-      var cell, test, _i, _len, _ref;
-      _ref = this.cells;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        cell = _ref[_i];
-        if (cell.x === pos.x && cell.y === pos.y) {
-          test = true;
+    Core.prototype.randomize = function() {
+      var i, x, y, _i, _ref, _results;
+      _results = [];
+      for (i = _i = 0, _ref = this.population; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        x = ~~(Math.random() * this.width);
+        y = ~~(Math.random() * this.height);
+        if (this.cells[x][y] === Status.alive) {
+          _results.push(--i);
+        } else {
+          _results.push(this.cells[x][y] = Status.alive);
         }
       }
-      if (!test) {
-        return this.cells[this.cells.length] = new Cell(pos.x, pos.y);
+      return _results;
+    };
+
+    Core.prototype.addCell = function(x, y) {
+      if (this.cells[x][y] === Status.dead) {
+        this.cells[x][y] = Status.alive;
+        return this.population++;
       }
     };
 
-    Core.prototype.update = function() {
-      var cell, count, i, index, indexes, j, _i, _j, _k, _l, _len, _len1, _ref;
-      indexes = [];
-      _ref = this.cells;
-      for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
-        cell = _ref[index];
-        count = 0;
-        for (i = _j = -1; _j <= 1; i = ++_j) {
-          for (j = _k = -1; _k <= 1; j = ++_k) {
-            if ((i !== j) && this._isAlive(cell.x + j, cell.y + i)) {
-              count++;
-            } else {
-              this._deadUpdate({
-                x: cell.x + i,
-                y: cell.y + j
-              });
-            }
-          }
-        }
-        if (__indexOf.call(this.alive, count) < 0) {
-          indexes[indexes.length] = index;
-        }
+    Core.prototype.killCell = function(x, y) {
+      if (this.cells[x][y] === Status.alive) {
+        this.cells[x][y] = Status.dead;
+        return this.population--;
       }
-      for (_l = 0, _len1 = indexes.length; _l < _len1; _l++) {
-        index = indexes[_l];
-        delete this.cells[index];
-      }
-      return this.cells = this.cells.filter(Boolean);
     };
 
-    Core.prototype._deadUpdate = function(cell) {
+    Core.prototype.isAlive = function(x, y) {
+      return this.cells[x][y];
+    };
+
+    Core.prototype.neighbours = function(x, y) {
       var count, i, j, _i, _j;
       count = 0;
       for (i = _i = -1; _i <= 1; i = ++_i) {
-        for (j = _j = -1; _j <= 1; j = ++_j) {
-          if ((i !== j) && this._isAlive(cell.x + j, cell.y + i)) {
-            count++;
+        if (this.cells[x + i]) {
+          for (j = _j = -1; _j <= 1; j = ++_j) {
+            if (!(i === j && j === 0)) {
+              if (this.cells[x + i][y + j] === Status.alive) {
+                count += 1;
+              }
+            }
           }
         }
       }
-      if (count === 3) {
-        return this.addCell(cell);
-      }
+      return count;
     };
 
-    Core.prototype._isAlive = function(x, y) {
-      var cell, _i, _len, _ref;
+    Core.prototype.update = function() {
+      var cell, count, line, x, y, _i, _len, _ref, _results;
       _ref = this.cells;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        cell = _ref[_i];
-        if (cell.x === x && cell.y === y) {
-          return true;
-        }
+      _results = [];
+      for (x = _i = 0, _len = _ref.length; _i < _len; x = ++_i) {
+        line = _ref[x];
+        _results.push((function() {
+          var _j, _len1, _results1;
+          _results1 = [];
+          for (y = _j = 0, _len1 = line.length; _j < _len1; y = ++_j) {
+            cell = line[y];
+            count = this.neighbours(x, y);
+            switch (cell) {
+              case Status.dead:
+                switch (count) {
+                  case 3:
+                    _results1.push(this.addCell(x, y));
+                    break;
+                  default:
+                    _results1.push(void 0);
+                }
+                break;
+              case Status.alive:
+                switch (count) {
+                  case 2:
+                  case 3:
+                    break;
+                  default:
+                    _results1.push(this.killCell(x, y));
+                }
+                break;
+              default:
+                _results1.push(void 0);
+            }
+          }
+          return _results1;
+        }).call(this));
       }
-      return false;
+      return _results;
     };
 
     return Core;
 
   })();
 
-  Cell = (function() {
-    Cell.prototype.x = 0;
-
-    Cell.prototype.y = 0;
-
-    function Cell(x, y) {
-      this.x = x != null ? x : 0;
-      this.y = y != null ? y : 0;
-    }
-
-    Cell.prototype.randomize = function(maxWidth, maxHeight) {
-      this.x = ~~(Math.random() * maxWidth);
-      this.y = ~~(Math.random() * maxHeight);
-      return {
-        x: this.x,
-        y: this.y
-      };
-    };
-
-    return Cell;
-
-  })();
+  window.Status = Status;
 
   window.Core = Core;
 

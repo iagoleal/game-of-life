@@ -33,17 +33,21 @@ class window.Interface
 	squareSide: 10 #px
 
 	soul: null
+	isPaused: false
 
 	constructor: (@canvas, @squareSide=@squareSide, total) ->
 		@context = @canvas.getContext '2d'
 		@width = @canvas.width
 		@height = @canvas.height
-
-		@soul = new Core (@positionToGrid {x:@width, y:@height} , total)
+		size = @positionToGrid {x:@width, y:@height} 
+		@soul = new Core size.x, size.y, total
 
 	loop: () ->
-		console.log @soul.cells.length
-		@soul.update()
+		unless @isPaused
+			console.log @soul.population
+
+			@soul.update()
+			#@isPaused = true
 		@draw()
 
 	draw: () ->
@@ -53,11 +57,13 @@ class window.Interface
 
 		# Draw each cell		
 		drawer.color = "green"
-		for cell in @soul.cells
-			pos = @gridToPosition 
-				x: cell.x
-				y: cell.y
-			drawer.rectangle @context, {x: pos.x, y: pos.y}, @squareSide, @squareSide
+		for line, i in @soul.cells
+			for cell, j in line
+				if @soul.cells[i][j] is Status.alive
+					pos = @gridToPosition 
+						x: i
+						y: j
+					drawer.rectangle @context, pos, @squareSide, @squareSide
 
 	drawGrid: (size, width, height) ->
 		# Draw the grid on the canvas
@@ -107,7 +113,14 @@ window.onload = ->
 			x: e.pageX - canvas.offsetLeft
 			y: e.pageY - canvas.offsetTop
 		console.log 'clicked on: ', pos.x, pos.y
-		game.soul.addCell pos
+		console.log game.soul.neighbours pos.x, pos.y
+		game.soul.addCell pos.x, pos.y
+
+	$( document ).keydown (e) ->
+		switch e.keyCode
+			when 32
+				e.preventDefault()
+				game.isPaused = !game.isPaused
 
 	window.game = new Interface canvas
 	window.mainLoop()
