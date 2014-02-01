@@ -35,6 +35,8 @@ class window.Interface
 	soul: null
 	isPaused: false
 
+	lastTime: null
+
 	constructor: (@canvas, @squareSide=@squareSide, total) ->
 		@context = @canvas.getContext '2d'
 		@width = @canvas.width
@@ -44,10 +46,9 @@ class window.Interface
 
 	loop: () ->
 		unless @isPaused
-			console.log @soul.population
-
 			@soul.update()
 			#@isPaused = true
+
 		@draw()
 
 	draw: () ->
@@ -92,20 +93,12 @@ class window.Interface
 
 window.Game = Interface
 
+
 window.onload = ->
 	canvas = document.getElementById "board"
 	
 	canvas.width = window.innerWidth
 	canvas.height = window.innerHeight
-	
-	###
-	window.addEventListener 'resize', resizeCanvas, false
-	canvas.addEventListener 'resize', resizeCanvas, false
-
-	resizeCanvas = =>
-		canvas.style.width = window.innerWidth
-		canvas.style.height = window.innerHeight
-	###
 
 	$('#board').click (e) ->
 		e.preventDefault()
@@ -127,18 +120,13 @@ window.onload = ->
 
 window.mainLoop = () ->
 	window.game.loop()
+	if typeof mainLoop.lastTime is 'undefined'
+		mainLoop.lastTime = new Date().getTime()
+	else
+		fps = 1000/(new Date().getTime() - mainLoop.lastTime)
+		document.getElementById("flag").innerHTML = fps.toFixed(2)
+		mainLoop.lastTime = new Date().getTime()
 
 	window.setTimeout ->
 		window.mainLoop()
-	, 1000/5
-
-	#window.requestAnimationFrame mainLoop
-
-
-window.requestAnimationFrame = do ->
-	#http://www.paulirish.com/2011/requestanimationframe-for-smart-animating/
-	window.requestAnimationFrame or
-	window.webkitRequestAnimationFrame or
-	window.mozRequestAnimationFrame or
-	(callback) ->
-		window.setTimeout(callback, 1000/60)
+	, 1000/7

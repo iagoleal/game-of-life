@@ -53,6 +53,8 @@
 
     Interface.prototype.isPaused = false;
 
+    Interface.prototype.lastTime = null;
+
     function Interface(canvas, squareSide, total) {
       var size;
       this.canvas = canvas;
@@ -69,7 +71,6 @@
 
     Interface.prototype.loop = function() {
       if (!this.isPaused) {
-        console.log(this.soul.population);
         this.soul.update();
       }
       return this.draw();
@@ -161,15 +162,6 @@
     canvas = document.getElementById("board");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    /*
-    	window.addEventListener 'resize', resizeCanvas, false
-    	canvas.addEventListener 'resize', resizeCanvas, false
-    
-    	resizeCanvas = =>
-    		canvas.style.width = window.innerWidth
-    		canvas.style.height = window.innerHeight
-    */
-
     $('#board').click(function(e) {
       var pos;
       e.preventDefault();
@@ -193,16 +185,18 @@
   };
 
   window.mainLoop = function() {
+    var fps;
     window.game.loop();
+    if (typeof mainLoop.lastTime === 'undefined') {
+      mainLoop.lastTime = new Date().getTime();
+    } else {
+      fps = 1000 / (new Date().getTime() - mainLoop.lastTime);
+      document.getElementById("flag").innerHTML = fps.toFixed(2);
+      mainLoop.lastTime = new Date().getTime();
+    }
     return window.setTimeout(function() {
       return window.mainLoop();
-    }, 1000 / 5);
+    }, 1000 / 7);
   };
-
-  window.requestAnimationFrame = (function() {
-    return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function(callback) {
-      return window.setTimeout(callback, 1000 / 60);
-    };
-  })();
 
 }).call(this);

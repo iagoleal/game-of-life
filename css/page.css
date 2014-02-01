@@ -1,7 +1,32 @@
-#board {
 
-    position: absolute;
+/* Main Div */
+#wrapper {
+	position: fixed;
     top: 0;
     left: 0;
+}
+
+#board {
+    position: absolute;
     z-index: 0;
+}
+
+#flag {
+	position: absolute;
+	z-index: 1;
+	left: 10px;
+	top: 10px;
+}
+
+.control {
+	border: 1px solid black;
+	border-radius: 4px;
+ 	padding: 3px 10px;
+	background:lightGray;
+	box-sizing: border-box;
+	box-shadow:5px 5px 5px rgba(0, 0, 0, 0.4);
+}
+
+.hidden {
+	display: none;
 }
