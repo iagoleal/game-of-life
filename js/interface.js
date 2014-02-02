@@ -49,13 +49,17 @@
 
     Interface.prototype.squareSide = 10;
 
+    Interface.prototype.fps = 7;
+
+    Interface.prototype.population = 1000;
+
     Interface.prototype.soul = null;
 
     Interface.prototype.isPaused = false;
 
     Interface.prototype.lastTime = null;
 
-    function Interface(canvas, squareSide, total) {
+    function Interface(canvas, squareSide) {
       var size;
       this.canvas = canvas;
       this.squareSide = squareSide != null ? squareSide : this.squareSide;
@@ -66,8 +70,17 @@
         x: this.width,
         y: this.height
       });
-      this.soul = new Core(size.x, size.y, total);
+      this.soul = new Core(size.x, size.y, this.population);
     }
+
+    Interface.prototype.restart = function() {
+      var size;
+      size = this.positionToGrid({
+        x: this.width,
+        y: this.height
+      });
+      return this.soul = new Core(size.x, size.y, this.population);
+    };
 
     Interface.prototype.loop = function() {
       if (!(this.isPaused || window.mousePressed)) {
@@ -79,7 +92,6 @@
     Interface.prototype.draw = function() {
       var cell, i, j, line, pos, _i, _len, _ref, _results;
       this.context.clearRect(0, 0, this.width, this.height);
-      this.drawGrid(this.squareSide, this.width, this.height);
       drawer.color = "green";
       _ref = this.soul.cells;
       _results = [];
@@ -158,10 +170,11 @@
   window.Game = Interface;
 
   window.onload = function() {
-    var canvas;
+    var canvas, ctrls, input, range, _i, _len;
     canvas = document.getElementById("board");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    window.game = new Interface(canvas);
     $('#board').mousedown(function(e) {
       var pos;
       e.preventDefault();
@@ -205,7 +218,8 @@
     });
     $('#btn-pause').click(function(e) {
       e.preventDefault();
-      return game.isPaused = !game.isPaused;
+      game.isPaused = !game.isPaused;
+      return $('#btn-pause').text(game.isPaused ? 'Continue' : 'Pause');
     });
     $('#btn-clear').click(function(e) {
       e.preventDefault();
@@ -213,9 +227,25 @@
     });
     $('#btn-new').click(function(e) {
       e.preventDefault();
+      return game.restart();
+    });
+    $('#btn-ctrl').click(function(e) {
+      e.preventDefault();
       return $('#panel').fadeToggle();
     });
-    window.game = new Interface(canvas);
+    $('#panel input').change(function(e) {});
+    ctrls = $("#panel input[type=range]");
+    for (_i = 0, _len = ctrls.length; _i < _len; _i++) {
+      range = ctrls[_i];
+      $(range).bind('change', function(e) {
+        game[this.dataset["var"]] = this.value;
+        return this.parentElement.querySelector('.label').innerHTML = this.value;
+      });
+      input = range.parentElement.querySelector('input[type=range]');
+      input.value = game[range.dataset["var"]];
+      range.parentElement.querySelector('.label').innerHTML = input.value;
+    }
+    $();
     return window.mainLoop();
   };
 
@@ -226,12 +256,12 @@
       mainLoop.lastTime = new Date().getTime();
     } else {
       fps = 1000 / (new Date().getTime() - mainLoop.lastTime);
-      document.getElementById("flag").innerHTML = fps.toFixed(2);
+      document.getElementById("flag").innerHTML = fps.toFixed(2) + ' fps';
       mainLoop.lastTime = new Date().getTime();
     }
     return window.setTimeout(function() {
       return window.mainLoop();
-    }, 1000 / 7);
+    }, 1000 / game.fps);
   };
 
 }).call(this);

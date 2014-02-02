@@ -31,18 +31,24 @@ class window.Interface
 	width: 0
 	height: 0
 	squareSide: 10 #px
+	fps: 7
+	population: 1000
 
 	soul: null
 	isPaused: false
 
 	lastTime: null
 
-	constructor: (@canvas, @squareSide=@squareSide, total) ->
+	constructor: (@canvas, @squareSide=@squareSide) ->
 		@context = @canvas.getContext '2d'
 		@width = @canvas.width
 		@height = @canvas.height
 		size = @positionToGrid {x:@width, y:@height} 
-		@soul = new Core size.x, size.y, total
+		@soul = new Core size.x, size.y, @population
+
+	restart: () ->
+		size = @positionToGrid {x:@width, y:@height} 
+		@soul = new Core size.x, size.y, @population
 
 	loop: () ->
 		unless @isPaused or window.mousePressed
@@ -54,8 +60,7 @@ class window.Interface
 	draw: () ->
 		@context.clearRect 0, 0, @width, @height
 		#Draw the grid
-		@drawGrid @squareSide, @width, @height
-
+		#@drawGrid @squareSide, @width, @height
 		# Draw each cell		
 		drawer.color = "green"
 		for line, i in @soul.cells
@@ -99,6 +104,7 @@ window.onload = ->
 	
 	canvas.width = window.innerWidth
 	canvas.height = window.innerHeight
+	window.game = new Interface canvas
 
 	$('#board').mousedown (e) ->
 		e.preventDefault()
@@ -133,9 +139,11 @@ window.onload = ->
 				e.preventDefault()
 				game.soul.clear()
 
+	# document.getElementById('btn-pause').click =
 	$( '#btn-pause' ).click (e) ->
 		e.preventDefault()
 		game.isPaused = !game.isPaused
+		$( '#btn-pause' ).text if game.isPaused then 'Continue' else 'Pause'
 		
 
 	$( '#btn-clear' ).click (e) ->
@@ -144,10 +152,26 @@ window.onload = ->
 
 	$( '#btn-new' ).click (e) ->
 		e.preventDefault()
+		game.restart()
+
+	$( '#btn-ctrl' ).click (e) ->
+		e.preventDefault()
 		$( '#panel' ).fadeToggle()
 
+	$( '#panel input').change (e) ->
 
-	window.game = new Interface canvas
+	ctrls = $( "#panel input[type=range]")
+	for range in ctrls
+		$(range).bind 'change', (e) ->
+			game[this.dataset.var] = @value
+			this.parentElement.querySelector('.label').innerHTML = @value
+
+		input = range.parentElement.querySelector('input[type=range]')
+		input.value = game[range.dataset.var]
+		range.parentElement.querySelector('.label').innerHTML = input.value
+
+	$()
+
 	window.mainLoop()
 
 window.mainLoop = () ->
@@ -156,8 +180,8 @@ window.mainLoop = () ->
 		mainLoop.lastTime = new Date().getTime()
 	else
 		fps = 1000/(new Date().getTime() - mainLoop.lastTime)
-		document.getElementById("flag").innerHTML = fps.toFixed(2)
+		document.getElementById("flag").innerHTML = fps.toFixed(2) + ' fps'
 		mainLoop.lastTime = new Date().getTime()
 	window.setTimeout ->
 		window.mainLoop()
-	, 1000/7
+	, 1000/game.fps

@@ -17,7 +17,7 @@
 		<div id="wrapper">
 			<div id='commands'>
 				<div class="control" id="flag">
-					FPS
+					0 fps
 				</div>
 				<br/>
 				<div class="control" id="btn-pause">
@@ -28,8 +28,12 @@
 					Clear
 				</div>
 				<br/>
+				<div class="control" id="btn-ctrl">
+					Advanced
+				</div>
+				<br/>
 				<div class="control" id="btn-new">
-					Game Controls
+					New Game
 				</div>
 			</div>
 
@@ -37,8 +41,55 @@
 				Canvas is not avaliable on your browser.
 			</canvas>
 
-			<div class="control hidden" id="panel">
-				Maximum fps: 
+			<div class="ocult control" id="panel">
+				<h2> Controls </h2>
+				<div>
+					<label> Maximum fps: </label>
+					<input type="range" min='1' max='100' value='0' data-var='fps'/>
+					<span class='label'> </span>
+				</div>
+
+				<div>
+					<label> Initial Population: </label>
+					<input type="range" min='0' max='15000' value='0' data-var='population'/>
+					<span class='label'> </span>
+				</div>
+
+				<div>
+					<label> Grid Side: </label>
+					<input type="range" min='1' max='50' value='0' data-var='squareSide'/>
+					<span class='label'> </span>
+				</div>
+
+				<div id='toborn'>
+					<label>Neighbours to born</label>
+					<br/>
+					0 <input type="checkbox" value="0">
+					1 <input type="checkbox" value="1">
+					2 <input type="checkbox" value="2">
+					3 <input type="checkbox" value="3" checked='true'>
+					4 <input type="checkbox" value="4">
+					5 <input type="checkbox" value="5">
+					6 <input type="checkbox" value="6">
+					7 <input type="checkbox" value="7">
+					8 <input type="checkbox" value="8">
+					9 <input type="checkbox" value="9">
+				</div>
+
+				<div>
+					<label>Neighbours to stay alive</label>
+					<br/>
+					0 <input type="checkbox" value="0">
+					1 <input type="checkbox" value="1">
+					2 <input type="checkbox" value="2" checked='true'>
+					3 <input type="checkbox" value="3" checked='true'>
+					4 <input type="checkbox" value="4">
+					5 <input type="checkbox" value="5">
+					6 <input type="checkbox" value="6">
+					7 <input type="checkbox" value="7">
+					8 <input type="checkbox" value="8">
+					9 <input type="checkbox" value="9">
+				</div>
 			</div>
 		</div>
 	</body>

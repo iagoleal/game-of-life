@@ -20,9 +20,9 @@ class Core
 
 	constructor: (@width=100,  @height=100, @population=@population) ->
 		@cells = new Array @width
-		for i in [0..@cells.length-1]
+		for i in [0..@cells.length]
 			@cells[i] = new Array @height
-			for j in [0..@cells[i].length-1]
+			for j in [0..@cells[i].length]
 				@cells[i][j] = Status.dead
 
 		@randomize()
@@ -35,6 +35,10 @@ class Core
 				--i
 			else
 				@cells[x][y] = Status.alive
+
+
+	resize:() ->
+		
 
 	clear: ->
 		for i in [0.. @cells.length-1]
@@ -56,7 +60,7 @@ class Core
 	neighbours: (x, y) ->
 		count = 0
 		for i in [-1..1] when @cells[x+i] 
-			for j in [-1..1] when not (i == j and j == 0)
+			for j in [-1..1] when not (i is j and j is 0)
 				if @cells[x+i][y+j] is Status.alive
 					count += 1
 		return count
@@ -70,14 +74,11 @@ class Core
 
 				switch cell
 					when Status.dead
-						switch count
-							when 3
-								changes.push {x: x, y: y}
+						if count in @born
+							changes.push {x: x, y: y}
 					when Status.alive
-						switch count
-							when 2, 3
-							else		
-								changes.push {x: x, y: y}
+						unless count in @alive
+							changes.push {x: x, y: y}
 
 		@cells[i.x][i.y] = !@cells[i.x][i.y] for i in changes 
 				

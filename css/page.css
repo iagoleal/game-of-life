@@ -6,11 +6,14 @@
     left: 0;
 }
 
+/* Canvas with the game */
 #board {
     position: absolute;
     z-index: 0;
 }
 
+
+/* Basic commands */
 #commands {
 	position: fixed;
 	z-index: 1;
@@ -19,24 +22,37 @@
 	text-align: center;
 }
 
-
+/* Advanced controls */
 #panel {
-  position: fixed;
-  z-index: 2;
-  top: 50%;
-  left: 50%;
+	position: fixed;
+	z-index: 2;
+
+	padding: 50px 50px;
+
+	width: 600px;
+	height: 400px;
+	left: 50%;
+	top: 50%;
+	margin-left: -200px;
+	margin-top: -200px;
+
  }
 
 .control {
-	padding: 5% 5%;
+	padding: 10px 10px;
 	color: #ffffff;
 	border: 0px solid black;
-	border-radius: 4px;
+	border-radius: 5px;
 	background: rgba(0, 0, 0, 0.6);
 	box-sizing: border-box;
 	box-shadow:5px 5px 5px rgba(0, 0, 0, 0.4);
+
 }
 
-.hidden {
+.ocult	{
 	display: none;
+}
+
+#panel input[type=range] { 
+	vertical-align:top; 
 }

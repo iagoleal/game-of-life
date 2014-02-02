@@ -8,7 +8,8 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
 
 
 (function() {
-  var Core, Status;
+  var Core, Status,
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   Status = {
     alive: true,
@@ -34,9 +35,9 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
       this.height = height != null ? height : 100;
       this.population = population != null ? population : this.population;
       this.cells = new Array(this.width);
-      for (i = _i = 0, _ref = this.cells.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      for (i = _i = 0, _ref = this.cells.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
         this.cells[i] = new Array(this.height);
-        for (j = _j = 0, _ref1 = this.cells[i].length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; j = 0 <= _ref1 ? ++_j : --_j) {
+        for (j = _j = 0, _ref1 = this.cells[i].length; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; j = 0 <= _ref1 ? ++_j : --_j) {
           this.cells[i][j] = Status.dead;
         }
       }
@@ -57,6 +58,8 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
       }
       return _results;
     };
+
+    Core.prototype.resize = function() {};
 
     Core.prototype.clear = function() {
       var i, j, _i, _ref, _results;
@@ -120,24 +123,19 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
           count = this.neighbours(x, y);
           switch (cell) {
             case Status.dead:
-              switch (count) {
-                case 3:
-                  changes.push({
-                    x: x,
-                    y: y
-                  });
+              if (__indexOf.call(this.born, count) >= 0) {
+                changes.push({
+                  x: x,
+                  y: y
+                });
               }
               break;
             case Status.alive:
-              switch (count) {
-                case 2:
-                case 3:
-                  break;
-                default:
-                  changes.push({
-                    x: x,
-                    y: y
-                  });
+              if (__indexOf.call(this.alive, count) < 0) {
+                changes.push({
+                  x: x,
+                  y: y
+                });
               }
           }
         }
