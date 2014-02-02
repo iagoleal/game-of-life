@@ -70,7 +70,7 @@
     }
 
     Interface.prototype.loop = function() {
-      if (!this.isPaused) {
+      if (!(this.isPaused || window.mousePressed)) {
         this.soul.update();
       }
       return this.draw();
@@ -162,23 +162,58 @@
     canvas = document.getElementById("board");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    $('#board').click(function(e) {
+    $('#board').mousedown(function(e) {
       var pos;
       e.preventDefault();
       pos = game.positionToGrid({
         x: e.pageX - canvas.offsetLeft,
         y: e.pageY - canvas.offsetTop
       });
-      console.log('clicked on: ', pos.x, pos.y);
-      console.log(game.soul.neighbours(pos.x, pos.y));
-      return game.soul.addCell(pos.x, pos.y);
+      game.soul.addCell(pos.x, pos.y);
+      return window.mousePressed = true;
     });
-    $(document).keydown(function(e) {
+    $('#board').mouseup(function(e) {
+      e.preventDefault();
+      return window.mousePressed = false;
+    });
+    $('#board').mousemove(function(e) {
+      var pos;
+      e.preventDefault();
+      if (window.mousePressed) {
+        pos = game.positionToGrid({
+          x: e.pageX - canvas.offsetLeft,
+          y: e.pageY - canvas.offsetTop
+        });
+        return game.soul.addCell(pos.x, pos.y);
+      }
+    });
+    $('#board').keydown(function(e) {
       switch (e.keyCode) {
         case 32:
           e.preventDefault();
-          return game.isPaused = !game.isPaused;
+          game.isPaused = !game.isPaused;
+          if (game.isPaused === true) {
+            return $('#btn-pause').text('Continue');
+          } else {
+            return $('#btn-pause').text('Pause');
+          }
+          break;
+        case 13:
+          e.preventDefault();
+          return game.soul.clear();
       }
+    });
+    $('#btn-pause').click(function(e) {
+      e.preventDefault();
+      return game.isPaused = !game.isPaused;
+    });
+    $('#btn-clear').click(function(e) {
+      e.preventDefault();
+      return game.soul.clear();
+    });
+    $('#btn-new').click(function(e) {
+      e.preventDefault();
+      return $('#panel').fadeToggle();
     });
     window.game = new Interface(canvas);
     return window.mainLoop();

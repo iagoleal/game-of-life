@@ -20,9 +20,9 @@ class Core
 
 	constructor: (@width=100,  @height=100, @population=@population) ->
 		@cells = new Array @width
-		for i in [0..@cells.length]
+		for i in [0..@cells.length-1]
 			@cells[i] = new Array @height
-			for j in [0..@cells[i].length]
+			for j in [0..@cells[i].length-1]
 				@cells[i][j] = Status.dead
 
 		@randomize()
@@ -35,6 +35,11 @@ class Core
 				--i
 			else
 				@cells[x][y] = Status.alive
+
+	clear: ->
+		for i in [0.. @cells.length-1]
+			for j in [0..@cells[i].length-1]
+				@cells[i][j] = Status.dead
 
 	addCell: (x, y) ->
 		if @cells[x][y] is Status.dead

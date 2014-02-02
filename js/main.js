@@ -34,9 +34,9 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
       this.height = height != null ? height : 100;
       this.population = population != null ? population : this.population;
       this.cells = new Array(this.width);
-      for (i = _i = 0, _ref = this.cells.length; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+      for (i = _i = 0, _ref = this.cells.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
         this.cells[i] = new Array(this.height);
-        for (j = _j = 0, _ref1 = this.cells[i].length; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; j = 0 <= _ref1 ? ++_j : --_j) {
+        for (j = _j = 0, _ref1 = this.cells[i].length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; j = 0 <= _ref1 ? ++_j : --_j) {
           this.cells[i][j] = Status.dead;
         }
       }
@@ -54,6 +54,22 @@ Any dead cell with exactly three live neighbours becomes a live cell, as if by r
         } else {
           _results.push(this.cells[x][y] = Status.alive);
         }
+      }
+      return _results;
+    };
+
+    Core.prototype.clear = function() {
+      var i, j, _i, _ref, _results;
+      _results = [];
+      for (i = _i = 0, _ref = this.cells.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+        _results.push((function() {
+          var _j, _ref1, _results1;
+          _results1 = [];
+          for (j = _j = 0, _ref1 = this.cells[i].length - 1; 0 <= _ref1 ? _j <= _ref1 : _j >= _ref1; j = 0 <= _ref1 ? ++_j : --_j) {
+            _results1.push(this.cells[i][j] = Status.dead);
+          }
+          return _results1;
+        }).call(this));
       }
       return _results;
     };

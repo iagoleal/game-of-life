@@ -45,7 +45,7 @@ class window.Interface
 		@soul = new Core size.x, size.y, total
 
 	loop: () ->
-		unless @isPaused
+		unless @isPaused or window.mousePressed
 			@soul.update()
 			#@isPaused = true
 
@@ -100,20 +100,52 @@ window.onload = ->
 	canvas.width = window.innerWidth
 	canvas.height = window.innerHeight
 
-	$('#board').click (e) ->
+	$('#board').mousedown (e) ->
 		e.preventDefault()
 		pos = game.positionToGrid 
 			x: e.pageX - canvas.offsetLeft
 			y: e.pageY - canvas.offsetTop
-		console.log 'clicked on: ', pos.x, pos.y
-		console.log game.soul.neighbours pos.x, pos.y
 		game.soul.addCell pos.x, pos.y
+		window.mousePressed = true
 
-	$( document ).keydown (e) ->
+	$('#board').mouseup (e) ->
+		e.preventDefault()		
+		window.mousePressed = false
+
+	$('#board').mousemove (e) ->
+		e.preventDefault()
+		if window.mousePressed
+			pos = game.positionToGrid 
+				x: e.pageX - canvas.offsetLeft
+				y: e.pageY - canvas.offsetTop
+			game.soul.addCell pos.x, pos.y
+
+	$( '#board' ).keydown (e) ->
 		switch e.keyCode
 			when 32
 				e.preventDefault()
 				game.isPaused = !game.isPaused
+				if game.isPaused is true
+					$( '#btn-pause' ).text 'Continue'
+				else
+					$( '#btn-pause' ).text 'Pause'
+			when 13
+				e.preventDefault()
+				game.soul.clear()
+
+	$( '#btn-pause' ).click (e) ->
+		e.preventDefault()
+		game.isPaused = !game.isPaused
+		
+
+	$( '#btn-clear' ).click (e) ->
+		e.preventDefault()
+		game.soul.clear()
+
+	$( '#btn-new' ).click (e) ->
+		e.preventDefault()
+		$( '#panel' ).fadeToggle()
+
 
 	window.game = new Interface canvas
 	window.mainLoop()
@@ -126,7 +158,6 @@ window.mainLoop = () ->
 		fps = 1000/(new Date().getTime() - mainLoop.lastTime)
 		document.getElementById("flag").innerHTML = fps.toFixed(2)
 		mainLoop.lastTime = new Date().getTime()
-
 	window.setTimeout ->
 		window.mainLoop()
 	, 1000/7
