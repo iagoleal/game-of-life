@@ -202,7 +202,7 @@
         return game.soul.addCell(pos.x, pos.y);
       }
     });
-    $('#board').keydown(function(e) {
+    $(document).keydown(function(e) {
       switch (e.keyCode) {
         case 32:
           e.preventDefault();

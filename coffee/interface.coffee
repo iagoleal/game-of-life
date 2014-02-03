@@ -125,7 +125,7 @@ window.onload = ->
 				y: e.pageY - canvas.offsetTop
 			game.soul.addCell pos.x, pos.y
 
-	$( '#board' ).keydown (e) ->
+	$( document ).keydown (e) ->
 		switch e.keyCode
 			when 32
 				e.preventDefault()
