@@ -60,7 +60,7 @@ class window.Interface
 	draw: () ->
 		@context.clearRect 0, 0, @width, @height
 		#Draw the grid
-		#@drawGrid @squareSide, @width, @height
+		@drawGrid @squareSide, @width, @height
 		# Draw each cell		
 		drawer.color = "green"
 		for line, i in @soul.cells
@@ -75,7 +75,6 @@ class window.Interface
 		# Draw the grid on the canvas
 		pos = {x:0.5, y:0.5}
 		drawer.color = 'lightGray'
-
 		while pos.x <= width
 			drawer.line @context, pos, {x: pos.x, y: pos.y + height}
 			pos.x += size
@@ -158,12 +157,21 @@ window.onload = ->
 		e.preventDefault()
 		$( '#panel' ).fadeToggle()
 
-	$( '#panel input').change (e) ->
+	for box in $('#panel input[type=checkbox]')
+		$(box).bind 'change', (e) ->
 
-	ctrls = $( "#panel input[type=range]")
-	for range in ctrls
+			value = parseInt(@value)
+			if @checked
+				
+				unless @value in game.soul[@name]
+					game.soul[@name].push value 
+			else
+				for n, i in game.soul[@name]
+					game.soul[@name].splice(i, 1) if n is value
+
+	for range in $( "#panel input[type=range]")
 		$(range).bind 'change', (e) ->
-			game[this.dataset.var] = @value
+			game[this.dataset.var] = parseInt(@value)
 			this.parentElement.querySelector('.label').innerHTML = @value
 
 		input = range.parentElement.querySelector('input[type=range]')
